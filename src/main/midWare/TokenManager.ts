@@ -8,6 +8,9 @@ class TokenManager {
 
     tokens = new Map<string, User>();
 
+    /**
+     * add res.locals.currentUser
+     */
     validate() {
         return (req: Request, res: Response, next: NextFunction) => {
             let token = req.headers["token"] as string | undefined;
@@ -17,7 +20,7 @@ class TokenManager {
                 this.tokens.delete(token);
                 next(HttpStatusCode.token过期);
             } else {
-                res.locals.user = this.tokens.get(token);
+                res.locals.currentUser = this.tokens.get(token);
                 next();
             }
         };
@@ -30,6 +33,9 @@ class TokenManager {
         );
     }
 
+    /**
+     * need res.locals.user
+     */
     generateToken() {
         return (req: Request, res: Response, next: NextFunction) => {
             let token = new Date().getTime() + "t" + v4();

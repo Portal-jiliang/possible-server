@@ -9,9 +9,9 @@ let router = express.Router();
 router.post(
     "/login",
     ReqLimiter.limit(["account", "password"]),
+    ReqLimiter.initEntity(User),
     async (req, res, next) => {
-        res.locals.user = new User(req.body.account, req.body.password);
-        if (await res.locals.user.login()) next();
+        if (await (res.locals.user as User).login()) next();
         else next(HttpStatusCode.用户不存在);
     },
     tokenManager.generateToken()
@@ -20,10 +20,10 @@ router.post(
 router.post(
     "/register",
     ReqLimiter.limit(["account", "password"]),
+    ReqLimiter.initEntity(User),
     async (req, res, next) => {
-        res.locals.user = new User(req.body.account, req.body.password);
-        if (await res.locals.user.register()) next();
-        else next("要注册的用户已经存在");
+        if (await (res.locals.user as User).register()) next();
+        else next(HttpStatusCode.要注册的用户已经存在);
     },
     tokenManager.generateToken()
 );

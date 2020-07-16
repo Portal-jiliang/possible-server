@@ -1,10 +1,14 @@
+// source map 对应
+require("source-map-support").install();
+
 // 配置地址转换
 const alias = require("module-alias");
 
 alias.addAlias("@", __dirname);
 
-import userCon from "@/controller/UserCtrl";
-import browseCtr from "@/controller/BrowseCtrl";
+import userCtrl from "@/controller/UserCtrl";
+import browseCtrl from "@/controller/BrowseCtrl";
+import createCtrl from "@/controller/createCtrl";
 import logger from "@/utils/Logger";
 import express, { NextFunction, Request, Response } from "express";
 import { HttpStatusCode } from "./utils/constants";
@@ -24,9 +28,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
-app.use("/user", userCon);
+app.use("/user", userCtrl);
 
-app.use("/browse", browseCtr);
+app.use("/browse", browseCtrl);
+
+app.use("/create", createCtrl);
 
 // 错误处理
 app.use(

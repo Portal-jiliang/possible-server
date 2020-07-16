@@ -14,6 +14,17 @@ class ReqLimiter {
             next();
         };
     }
+
+    initEntity<T>(entity: new (...param: any) => T, prop?: string) {
+        return (req: Request, res: Response, next: NextFunction) => {
+            let reqBody = req.method == "GET" ? req.query : req.body;
+            let params = prop ? reqBody[prop] : reqBody;
+            let instance = new entity();
+            Object.assign(instance, params);
+            res.locals[entity.name.toLowerCase()] = instance;
+            next();
+        };
+    }
 }
 
 export default new ReqLimiter();

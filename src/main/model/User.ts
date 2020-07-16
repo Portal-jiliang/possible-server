@@ -1,5 +1,6 @@
 import UserRepo from "@/repo/UserRepo";
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import Logger from "@/utils/Logger";
 
 @Entity()
 export default class User {
@@ -18,24 +19,12 @@ export default class User {
     }
 
     async login() {
-        let person = await UserRepo.getRepo()
-            .createQueryBuilder()
-            .where(
-                "user.account = :account and user.password = :password",
-                this
-            )
-            .getOne();
+        let person = await UserRepo.getRepo().findOne(this);
+        if (person != undefined) Object.assign(this, person);
         return person != undefined;
     }
 
     async register() {
-        let person = await UserRepo.getRepo()
-            .createQueryBuilder()
-            .where("user.account = :account", this)
-            .getOne();
-        if (person == undefined) {
-            await UserRepo.getRepo().save(this);
-            return true;
-        } else return false;
+        return await UserRepo.add(this);
     }
 }

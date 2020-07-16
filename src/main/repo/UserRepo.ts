@@ -1,13 +1,9 @@
-import { getConnection, Repository } from "typeorm";
 import User from "@/model/User";
 import Repo from "./Repo";
 
-class UserRepo extends Repo {
-    private repo?: Repository<User>;
-
+class UserRepo extends Repo<User> {
     getRepo() {
-        this.repo = getConnection().getRepository(User);
-        return this.repo;
+        return this.getRepoByEntity(User);
     }
 }
 

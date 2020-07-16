@@ -10,6 +10,7 @@ import User from "./User";
 import { Worker, spawn, Thread } from "threads";
 import { Transpiler } from "@/utils/Transpiler";
 import Logger from "@/utils/Logger";
+import Page from "./Page";
 
 @Entity()
 export default class Story {
@@ -19,32 +20,39 @@ export default class Story {
     @Column()
     title: string;
 
+    @Column()
+    cover: string;
+
     @OneToOne(() => User)
     @JoinColumn({ name: "author" })
     author: User;
 
     @Column()
-    pageSrc?: string;
+    src?: string;
 
     @Column()
     viewURL?: string;
 
-    pages?: [];
+    pages: Page[];
 
-    constructor($title: string, $author: User) {
-        this.title = $title;
-        this.author = $author;
+    constructor(title: string, cover: string, author: User, pages: Page[]) {
+        this.title = title;
+        this.cover = cover;
+        this.author = author;
+        this.pages = pages;
     }
 
     async compileAndSave() {
-        await StoryRepo.getRepo().save(this);
+        let novel = await StoryRepo.getRepo().save(this);
+        Object.assign(this, novel);
         spawn<Transpiler>(new Worker("../utils/Transpiler"))
             .then(async worker => {
-                await worker.transpile(this);
+                let story = await worker.transpile(this);
                 await Thread.terminate(worker);
+                StoryRepo.getRepo().save(story);
             })
             .catch(e => {
-                Logger.logError("转换出错:" + e);
+                Logger.error("转换出错:" + e);
             });
     }
 }

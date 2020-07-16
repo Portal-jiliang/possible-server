@@ -8,11 +8,11 @@ class Logger {
     }
 
     logError(mes: string) {
-        console.log(this.generateMes("error:" + mes));
+        console.log(this.generateMes("错误:" + mes));
     }
 
     error(mes: string) {
-        throw this.generateMes(mes);
+        throw new Error(this.generateMes(mes));
     }
 }
 

@@ -6,27 +6,27 @@ const alias = require("module-alias");
 
 alias.addAlias("@", __dirname);
 
-import userCtrl from "@/controller/UserCtrl";
 import browseCtrl from "@/controller/BrowseCtrl";
 import createCtrl from "@/controller/createCtrl";
+import userCtrl from "@/controller/UserCtrl";
 import logger from "@/utils/Logger";
+import bodyParser from "body-parser";
 import express, { NextFunction, Request, Response } from "express";
 import { HttpStatusCode } from "./utils/constants";
 
 // 启动Server
 const app = express();
 
+app.use(bodyParser());
 app.use(express.urlencoded({ extended: true }));
 
 // 记录请求
 app.use((req: Request, res: Response, next: NextFunction) => {
-    logger.log(
-        `收到请求:路径:${req.url} 方式:${req.method} 内容:${JSON.stringify(
-            req.method == "GET" ? req.query : req.body
-        )}`
-    );
+    logger.log(`收到请求:路径:${req.url} 方式:${req.method}`);
     next();
 });
+
+app.use("/novel", express.static("public/novel"));
 
 app.use("/user", userCtrl);
 

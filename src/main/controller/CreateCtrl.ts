@@ -9,7 +9,7 @@ let router = express.Router();
 router.post(
     "/upload",
     TokenManager.validate(),
-    ReqLimiter.limit(["title", "pages"]),
+    ReqLimiter.limit(["title", "pages", "cover"]),
     ReqLimiter.initEntity(Story),
     async (req, res, next) => {
         let story: Story = res.locals.story;

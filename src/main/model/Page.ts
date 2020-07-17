@@ -14,13 +14,21 @@ enum Animation {}
 
 export interface Component {
     type: ComponentType;
-    position: {
-        x: number;
-        y: number;
+    position?: {
+        x: number | string;
+        y: number | string;
     };
-    background: string;
+    size?: {
+        x: number | string;
+        y: number | string;
+    };
+    padding?: number | string;
+    font?: string;
+    border?: string;
+    color?: string;
+    background?: string;
     content?: string;
     children?: Component[];
     animation?: Animation;
-    jump: string | undefined;
+    jump?: string | undefined;
 }

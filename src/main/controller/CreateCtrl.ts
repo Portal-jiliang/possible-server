@@ -14,8 +14,23 @@ router.post(
     async (req, res, next) => {
         let story: Story = res.locals.story;
         story.author = res.locals.currentUser as User;
-        await story.compileAndSave();
+        await story.save();
+        story.compile();
         res.sendStatus(200);
+        next();
+    }
+);
+
+router.post(
+    "/preview",
+    TokenManager.validate(),
+    ReqLimiter.limit(["title", "pages", "cover"]),
+    ReqLimiter.initEntity(Story),
+    async (req, res, next) => {
+        let story: Story = res.locals.story;
+        story.author = res.locals.currentUser as User;
+        let viewURL = await story.compile(true);
+        res.send(viewURL);
         next();
     }
 );

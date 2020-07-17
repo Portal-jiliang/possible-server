@@ -6,6 +6,6 @@
     "password": "root",
     "database": "possible",
     "entities": [
-        "dist/model/*.js"
+        "src/main/model/*.ts"
     ]
 }

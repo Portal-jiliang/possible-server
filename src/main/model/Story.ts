@@ -11,6 +11,7 @@ import { Worker, spawn, Thread } from "threads";
 import { Transpiler } from "@/utils/Transpiler";
 import Logger from "@/utils/Logger";
 import Page from "./Page";
+import FileStorage from "@/utils/FileStorage";
 
 @Entity()
 export default class Story {
@@ -42,17 +43,39 @@ export default class Story {
         this.pages = pages;
     }
 
-    async compileAndSave() {
+    /**
+     * add id
+     */
+    async save() {
         let novel = await StoryRepo.getRepo().save(this);
         Object.assign(this, novel);
-        spawn<Transpiler>(new Worker("../utils/Transpiler"))
-            .then(async worker => {
-                let story = await worker.transpile(this);
-                await Thread.terminate(worker);
-                StoryRepo.getRepo().save(story);
-            })
-            .catch(e => {
-                Logger.error("转换出错:" + e);
-            });
+    }
+
+    /**
+     * @param  {boolean} isPreview need id when false
+     */
+    async compile(isPreview: boolean = false) {
+        try {
+            let worker = await spawn<Transpiler>(
+                new Worker("../utils/Transpiler")
+            );
+            let story = await worker.transpile(this, isPreview);
+            await Thread.terminate(worker);
+            if (isPreview)
+                setTimeout(() => {
+                    if (story.viewURL)
+                        FileStorage.deleteFolder(
+                            story.viewURL?.substring(
+                                0,
+                                story.viewURL.lastIndexOf("/")
+                            )
+                        );
+                }, 1000 * 60 * 30);
+            else StoryRepo.getRepo().save(story);
+            return story.viewURL;
+        } catch (e) {
+            Logger.error("转换出错:" + e);
+            return undefined;
+        }
     }
 }

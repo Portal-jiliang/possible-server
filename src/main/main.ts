@@ -10,14 +10,20 @@ import browseCtrl from "@/controller/BrowseCtrl";
 import createCtrl from "@/controller/createCtrl";
 import userCtrl from "@/controller/UserCtrl";
 import logger from "@/utils/Logger";
-import bodyParser from "body-parser";
 import express, { NextFunction, Request, Response } from "express";
 import { HttpStatusCode } from "./utils/constants";
+import FileStorage from "./utils/FileStorage";
+import bodyParser from "body-parser";
+
+// 初始化文件夹
+FileStorage.init();
+FileStorage.cleanPreviewFolder();
 
 // 启动Server
 const app = express();
 
-app.use(bodyParser());
+app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 
 // 记录请求

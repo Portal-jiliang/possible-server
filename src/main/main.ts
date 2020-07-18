@@ -7,13 +7,13 @@ const alias = require("module-alias");
 alias.addAlias("@", __dirname);
 
 import browseCtrl from "@/controller/BrowseCtrl";
+import constantCtrl from "@/controller/ConstantCtrl";
 import createCtrl from "@/controller/createCtrl";
 import userCtrl from "@/controller/UserCtrl";
 import logger from "@/utils/Logger";
 import express, { NextFunction, Request, Response } from "express";
 import { HttpStatusCode } from "./utils/constants";
 import FileStorage from "./utils/FileStorage";
-import bodyParser from "body-parser";
 
 // 初始化文件夹
 FileStorage.init();
@@ -39,6 +39,8 @@ app.use("/user", userCtrl);
 app.use("/browse", browseCtrl);
 
 app.use("/create", createCtrl);
+
+app.use("/constant", constantCtrl);
 
 // 错误处理
 app.use(

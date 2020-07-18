@@ -40,4 +40,10 @@ export default abstract class Repo<T extends object> {
             return false;
         }
     }
+
+    sort(prop: keyof T, sort: "ASC" | "DESC") {
+        return this.getRepo()
+            .createQueryBuilder()
+            .orderBy(prop as string, sort);
+    }
 }

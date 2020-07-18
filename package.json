@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/main.js",
   "scripts": {
-    "devServer": "npx ts-node-dev src/main/main.ts --no-notify",
+    "devServer": "npx ts-node-dev --no-notify --watch src/main/utils src/main/main.ts ",
     "build": "tsc"
   },
   "author": "RichardLuo",

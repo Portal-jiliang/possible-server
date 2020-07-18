@@ -1,5 +1,5 @@
 import logger from "@/utils/Logger";
-import { Connection, createConnection } from "typeorm";
+import { createConnection } from "typeorm";
 
 export default class Database {
     static isConnecting: boolean = false;

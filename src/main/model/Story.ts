@@ -12,6 +12,7 @@ import { Transpiler } from "@/utils/Transpiler";
 import Logger from "@/utils/Logger";
 import Page from "./Page";
 import FileStorage from "@/utils/FileStorage";
+import Ctg from "./Ctg";
 
 @Entity()
 export default class Story {
@@ -33,6 +34,16 @@ export default class Story {
 
     @Column()
     viewURL?: string;
+
+    @Column()
+    rating?: number;
+
+    @Column()
+    summary?: string;
+
+    @OneToOne(() => Ctg)
+    @JoinColumn({ name: "ctg" })
+    ctg?: Ctg;
 
     pages: Page[];
 

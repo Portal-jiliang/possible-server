@@ -1,21 +1,22 @@
 import StoryRepo from "@/repo/StoryRepo";
+import FileStorage from "@/utils/FileStorage";
+import Logger from "@/utils/Logger";
+import { Transpiler } from "@/utils/Transpiler";
+import { spawn, Thread, Worker } from "threads";
 import {
+    BaseEntity,
     Column,
     Entity,
     JoinColumn,
     OneToOne,
     PrimaryGeneratedColumn,
 } from "typeorm";
-import User from "./User";
-import { Worker, spawn, Thread } from "threads";
-import { Transpiler } from "@/utils/Transpiler";
-import Logger from "@/utils/Logger";
-import Page from "./Page";
-import FileStorage from "@/utils/FileStorage";
 import Ctg from "./Ctg";
+import Page from "./Page";
+import User from "./User";
 
 @Entity()
-export default class Story {
+export default class Story extends BaseEntity {
     @PrimaryGeneratedColumn()
     id?: number;
 
@@ -48,18 +49,11 @@ export default class Story {
     pages: Page[];
 
     constructor(title: string, cover: string, author: User, pages: Page[]) {
+        super();
         this.title = title;
         this.cover = cover;
         this.author = author;
         this.pages = pages;
-    }
-
-    /**
-     * add id
-     */
-    async save() {
-        let novel = await StoryRepo.getRepo().save(this);
-        Object.assign(this, novel);
     }
 
     /**

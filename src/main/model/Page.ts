@@ -23,6 +23,7 @@ export interface Component {
         y: number | string;
     };
     padding?: number | string;
+    textAlign: string;
     font?: string;
     border?: string;
     color?: string;
@@ -30,5 +31,9 @@ export interface Component {
     content?: string;
     children?: Component[];
     animation?: Animation;
+    click?: {
+        color?: string;
+        background?: string;
+    };
     jump?: string | undefined;
 }

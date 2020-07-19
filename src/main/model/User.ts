@@ -1,9 +1,8 @@
 import UserRepo from "@/repo/UserRepo";
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import Logger from "@/utils/Logger";
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export default class User {
+export default class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id?: number;
 
@@ -14,6 +13,7 @@ export default class User {
     password: string;
 
     constructor(account: string, password: string) {
+        super();
         this.account = account;
         this.password = password;
     }

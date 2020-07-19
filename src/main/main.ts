@@ -10,6 +10,7 @@ import browseCtrl from "@/controller/BrowseCtrl";
 import constantCtrl from "@/controller/ConstantCtrl";
 import createCtrl from "@/controller/createCtrl";
 import userCtrl from "@/controller/UserCtrl";
+import communityCtrl from "@/controller/CommunityCtrl";
 import logger from "@/utils/Logger";
 import express, { NextFunction, Request, Response } from "express";
 import { HttpStatusCode } from "./utils/constants";
@@ -41,6 +42,8 @@ app.use("/browse", browseCtrl);
 app.use("/create", createCtrl);
 
 app.use("/constant", constantCtrl);
+
+app.use("/community", communityCtrl);
 
 // 错误处理
 app.use(

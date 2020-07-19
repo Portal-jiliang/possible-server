@@ -1,4 +1,4 @@
-import Page from "@/model/Page";
+import Page, { Component } from "@/model/Page";
 import Story from "@/model/Story";
 import { expose } from "threads";
 import { v4 } from "uuid";
@@ -31,7 +31,9 @@ const transpiler = {
     },
 
     async generateOnePage(page: Page) {
-        var root = xmlbuilder.create("html").ele("body", {
+        let html = xmlbuilder.create("html");
+        let style = html.ele("style");
+        let root = html.ele("body", {
             style:
                 transpiler.computeStyle(
                     "background",
@@ -40,11 +42,31 @@ const transpiler = {
                         : page.background
                 ) + "margin:0px;padding:0px;background-size:cover;",
         });
+        let i = 0;
         for (const component of page.components) {
+            let classId = "c-" + i;
+            let temp: typeof component.click = {};
+            if (component.click) {
+                for (const key in component.click) {
+                    (temp as any)[key] = (component as any)[key];
+                    (component as any)[key] = undefined;
+                }
+                style.text(
+                    `.${classId} { transition:300ms;${transpiler.computeClickStyle(
+                        temp
+                    )} }`
+                );
+                style.text(
+                    `.${classId}:active { ${transpiler.computeClickStyle(
+                        component.click
+                    )} }`
+                );
+            }
             root.ele(
                 "div",
                 {
-                    style: `position:absolute;top:${
+                    class: classId,
+                    style: `position:absolute;user-select:none;box-sizing:border-box;top:${
                         transpiler.numberToPx(component.position?.y) ?? 0
                     };left:${
                         transpiler.numberToPx(component.position?.x) ?? 0
@@ -52,15 +74,18 @@ const transpiler = {
                         transpiler.numberToPx(component.size?.x) ??
                         "fit-content"
                     };height:${
-                        transpiler.numberToPx(component.size?.x) ??
+                        transpiler.numberToPx(component.size?.y) ??
                         "fit-content"
                     };padding:${
                         transpiler.numberToPx(component.padding) ?? "0px"
                     };${transpiler.computeStyle(
+                        "text-align",
+                        component.textAlign
+                    )}${transpiler.computeStyle(
                         "background",
                         component.background
                             ? component.background?.startsWith("http")
-                                ? `url(${page.background})`
+                                ? `url(${component.background})`
                                 : component.background
                             : undefined
                     )}background-size:cover;${
@@ -79,12 +104,26 @@ const transpiler = {
                 },
                 component.content
             );
+            i++;
         }
         return root.end();
     },
 
     computeStyle(prop: string, value?: string) {
         return value ? `${prop}:${value};` : "";
+    },
+
+    computeClickStyle(click: Component["click"]) {
+        return `${
+            transpiler.computeStyle(
+                "background",
+                click?.background
+                    ? click.background?.startsWith("http")
+                        ? `url(${click.background})`
+                        : click.background
+                    : undefined
+            ) + transpiler.computeStyle("color", click?.color)
+        }`;
     },
 
     numberToPx(number?: number | string): string | undefined {

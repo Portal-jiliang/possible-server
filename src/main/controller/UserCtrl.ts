@@ -12,7 +12,7 @@ router.post(
     ReqLimiter.initEntity(User),
     async (req, res, next) => {
         if (await (res.locals.user as User).login()) next();
-        else next(HttpStatusCode.用户不存在);
+        else next(HttpStatusCode.实体不存在);
     },
     tokenManager.generateToken()
 );

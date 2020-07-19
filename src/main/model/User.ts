@@ -10,7 +10,7 @@ export default class User {
     @Column()
     account: string;
 
-    @Column()
+    @Column({ select: false })
     password: string;
 
     constructor(account: string, password: string) {

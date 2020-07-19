@@ -20,16 +20,20 @@ const transpiler = {
         return story;
     },
 
-    generateHtml(story: Story, path: string) {
+    async generateHtml(story: Story, path: string) {
         for (const page of story.pages) {
-            transpiler.generateOnePage(page, path);
+            FileStorage.createHtmlFile(
+                path,
+                page.isFirst ? entryFile : page.title,
+                await transpiler.generateOnePage(page)
+            );
         }
     },
 
-    generateOnePage(page: Page, path: string) {
+    async generateOnePage(page: Page) {
         var root = xmlbuilder.create("html").ele("body", {
             style:
-                this.computeStyle(
+                transpiler.computeStyle(
                     "background",
                     page.background.startsWith("http")
                         ? `url(${page.background})`
@@ -41,16 +45,18 @@ const transpiler = {
                 "div",
                 {
                     style: `position:absolute;top:${
-                        this.numberToPx(component.position?.y) ?? 0
+                        transpiler.numberToPx(component.position?.y) ?? 0
                     };left:${
-                        this.numberToPx(component.position?.x) ?? 0
+                        transpiler.numberToPx(component.position?.x) ?? 0
                     };width:${
-                        this.numberToPx(component.size?.x) ?? "fit-content"
+                        transpiler.numberToPx(component.size?.x) ??
+                        "fit-content"
                     };height:${
-                        this.numberToPx(component.size?.x) ?? "fit-content"
+                        transpiler.numberToPx(component.size?.x) ??
+                        "fit-content"
                     };padding:${
-                        this.numberToPx(component.padding) ?? "0px"
-                    };${this.computeStyle(
+                        transpiler.numberToPx(component.padding) ?? "0px"
+                    };${transpiler.computeStyle(
                         "background",
                         component.background
                             ? component.background?.startsWith("http")
@@ -58,9 +64,9 @@ const transpiler = {
                                 : component.background
                             : undefined
                     )}background-size:cover;${
-                        this.computeStyle("font-family", component.font) +
-                        this.computeStyle("color", component.color) +
-                        this.computeStyle(
+                        transpiler.computeStyle("font-family", component.font) +
+                        transpiler.computeStyle("color", component.color) +
+                        transpiler.computeStyle(
                             "border",
                             component.border
                                 ? component.border + " solid"
@@ -74,11 +80,7 @@ const transpiler = {
                 component.content
             );
         }
-        FileStorage.createHtmlFile(
-            path,
-            page.isFirst ? entryFile : page.title,
-            root.end()
-        );
+        return root.end();
     },
 
     computeStyle(prop: string, value?: string) {

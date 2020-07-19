@@ -52,7 +52,7 @@ app.use(
     ) => {
         res.sendStatus(error);
         logger.logError(
-            `错误:路径:${req.url} 方式:${req.method} 内容:${JSON.stringify(
+            `路径:${req.url} 方式:${req.method} 内容:${JSON.stringify(
                 req.method == "GET" ? req.query : req.body
             )} ${HttpStatusCode[error]}`
         );

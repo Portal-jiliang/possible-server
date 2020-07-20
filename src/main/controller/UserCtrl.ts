@@ -3,6 +3,7 @@ import User from "@/model/User";
 import express from "express";
 import { HttpStatusCode } from "@/utils/constants";
 import ReqLimiter from "@/midWare/ReqLimiter";
+import StoryRepo from "@/repo/StoryRepo";
 
 let router = express.Router();
 
@@ -27,5 +28,15 @@ router.post(
     },
     tokenManager.generateToken()
 );
+
+router.post("/story", tokenManager.validate(), async (req, res, next) => {
+    res.send(
+        await StoryRepo.getRepo().find({
+            select: ["id", "title", "cover", "summary"],
+            where: { author: res.locals.currentUser },
+        })
+    );
+    next();
+});
 
 export default router;

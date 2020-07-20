@@ -8,7 +8,7 @@ export default abstract class Repo<T extends object> {
         Database.createConnection();
     }
 
-    getRepoByEntity(entity: Function) {
+    protected getRepoByEntity(entity: Function) {
         return this.repo ?? (this.repo = getConnection().getRepository(entity));
     }
 

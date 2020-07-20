@@ -7,6 +7,7 @@ import express from "express";
 import { Thread, Worker, spawn } from "threads";
 import { HttpStatusCode } from "@/utils/constants";
 import Logger from "@/utils/Logger";
+import StoryRepo from "@/repo/StoryRepo";
 
 let router = express.Router();
 
@@ -18,8 +19,30 @@ router.post(
     async (req, res, next) => {
         let story: Story = res.locals.story;
         story.author = res.locals.currentUser as User;
-        await story.save();
-        story.compile();
+        let isSuccessful = false;
+        if (story.id != undefined) {
+            let condition: { author: any; id?: number } = {
+                author: res.locals.currentUser.id,
+            };
+            condition.id = story.id;
+            let updateColumn = Object.assign({}, story);
+            delete updateColumn.pages;
+            delete updateColumn.viewURL;
+            delete updateColumn.src;
+            const result = await StoryRepo.getRepo().update(
+                condition,
+                updateColumn
+            );
+            if (result.affected && result.affected > 0) isSuccessful = true;
+            else {
+                next(HttpStatusCode.权限错误);
+                return;
+            }
+        } else {
+            await StoryRepo.add(story);
+            isSuccessful = true;
+        }
+        if (isSuccessful) story.compile();
         res.sendStatus(200);
         next();
     }
@@ -59,6 +82,25 @@ router.post(
         if (html != undefined) res.send(html);
         Thread.terminate(worker);
         next();
+    }
+);
+
+router.post(
+    "/edit",
+    TokenManager.validate(),
+    ReqLimiter.limit(["story"]),
+    async (req, res, next) => {
+        let story = await StoryRepo.getRepo().findOne(req.body.story, {
+            where: { author: res.locals.currentUser },
+        });
+        if (story == undefined) next(HttpStatusCode.权限错误);
+        else {
+            let src = story.readScr();
+            if (src != undefined) {
+                story.pages = JSON.parse(src);
+                res.send(story);
+            } else next(HttpStatusCode.转换出错);
+        }
     }
 );
 

@@ -18,6 +18,11 @@ class FileStorage {
         return this.createFile(path, content);
     }
 
+    readSrcFile(name: string) {
+        let path = LocalPath.novelSrc + "/" + name;
+        return this.readFile(path);
+    }
+
     createHtmlFolder(name: string, isPreview: boolean) {
         let folder =
             (isPreview ? LocalPath.novelPreview : LocalPath.novelHtml) +
@@ -35,9 +40,15 @@ class FileStorage {
         return path;
     }
 
+    readFile(path: string) {
+        let realPath = this.baseDir + path;
+        if (fs.existsSync(realPath)) return fs.readFileSync(realPath, "utf-8");
+        else return undefined;
+    }
+
     createFolder(path: string) {
-        if (!fs.existsSync(this.baseDir + path))
-            fs.mkdirSync(this.baseDir + path);
+        let realPath = this.baseDir + path;
+        if (!fs.existsSync(realPath)) fs.mkdirSync(realPath);
         return path;
     }
 

@@ -39,7 +39,7 @@ router.post(
     }
 );
 
-router.use(
+router.post(
     "/comment/view",
     ReqLimiter.limit(["story"]),
     async (req, res, next) => {
@@ -51,5 +51,28 @@ router.use(
         });
     }
 );
+
+router.post(
+    "/solitaire/create",
+    TokenManager.validate(),
+    ReqLimiter.limit(["story"]),
+    async (req, res, next) => {
+        const result = await StoryRepo.getRepo().update(
+            { id: req.body.story, author: res.locals.currentUser.id },
+            { solitaire: true }
+        );
+        if (result.affected && result.affected > 0) res.send(200);
+        else next(HttpStatusCode.权限错误);
+    }
+);
+
+router.post("/solitaire/get", async (req, res, next) => {
+    res.send(
+        await StoryRepo.getRepo().find({
+            where: { solitaire: true },
+            select: ["title", "cover", "summary", "id"],
+        })
+    );
+});
 
 export default router;

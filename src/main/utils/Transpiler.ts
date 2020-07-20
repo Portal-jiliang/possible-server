@@ -8,14 +8,15 @@ import FileStorage from "./FileStorage";
 const entryFile = "index";
 
 const transpiler = {
-    async transpile(story: Story, isPreview: boolean = false) {
-        story.src = FileStorage.createSrcFile(
-            story.id + story.title + ".json",
-            JSON.stringify(story.pages)
-        );
-        let path = isPreview ? v4() : story.id + story.title;
+    async transpile(name: string, story: Story, isPreview: boolean = false) {
+        if (!isPreview)
+            story.src = FileStorage.createSrcFile(
+                name + ".json",
+                JSON.stringify(story.pages)
+            );
+        let path = isPreview ? v4() : name;
         let folder = FileStorage.createHtmlFolder(path, isPreview);
-        transpiler.generateHtml(story, folder);
+        await transpiler.generateHtml(story, folder);
         story.viewURL = folder + "/" + entryFile + ".html";
         return story;
     },
@@ -37,7 +38,7 @@ const transpiler = {
             style:
                 transpiler.computeStyle(
                     "background",
-                    page.background.startsWith("http")
+                    page.background?.startsWith("http")
                         ? `url(${page.background})`
                         : page.background
                 ) + "margin:0px;padding:0px;background-size:cover;",
@@ -106,7 +107,7 @@ const transpiler = {
             );
             i++;
         }
-        return root.end();
+        return root.end({ allowEmpty: true });
     },
 
     computeStyle(prop: string, value?: string) {

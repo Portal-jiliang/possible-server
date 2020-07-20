@@ -46,6 +46,9 @@ export default class Story extends BaseEntity {
     @JoinColumn({ name: "ctg" })
     ctg?: Ctg;
 
+    @Column()
+    solitaire?: boolean;
+
     pages: Page[];
 
     constructor(title: string, cover: string, author: User, pages: Page[]) {
@@ -62,9 +65,13 @@ export default class Story extends BaseEntity {
     async compile(isPreview: boolean = false) {
         try {
             let worker = await spawn<Transpiler>(
-                new Worker("../utils/Transpiler")
+                new Worker("../utils/Transpiler.ts")
             );
-            let story = await worker.transpile(this, isPreview);
+            let story = await worker.transpile(
+                this.getFileName(),
+                this,
+                isPreview
+            );
             await Thread.terminate(worker);
             if (isPreview)
                 setTimeout(() => {
@@ -82,5 +89,13 @@ export default class Story extends BaseEntity {
             Logger.error("转换出错:" + e);
             return undefined;
         }
+    }
+
+    readScr() {
+        return FileStorage.readSrcFile(this.getFileName() + ".json");
+    }
+
+    protected getFileName() {
+        return this.id + this.title;
     }
 }

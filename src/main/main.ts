@@ -8,7 +8,7 @@ alias.addAlias("@", __dirname);
 
 import browseCtrl from "@/controller/BrowseCtrl";
 import constantCtrl from "@/controller/ConstantCtrl";
-import createCtrl from "@/controller/createCtrl";
+import createCtrl from "@/controller/CreateCtrl";
 import userCtrl from "@/controller/UserCtrl";
 import communityCtrl from "@/controller/CommunityCtrl";
 import logger from "@/utils/Logger";
